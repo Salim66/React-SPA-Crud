@@ -1,48 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row, Table } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import './StaffCreate.css';
+import './StaffEdit.css';
 
-const StaffCreate = () => {
+const StaffEdit = (props) => {
 
-    const [input, setInput] = useState({
+    const [editData, setEditData] = useState({
         name: '',
         job: '',
         photo: ''
     });
 
+    const { id } = useParams();
+
+    useEffect(() => {
+        axios.get('http://localhost:3000/staff/' + id).then(res => {
+            setEditData(res.data)
+            console.log(res.data);
+        })
+    }, [])
+
     const navigate = useNavigate();
 
     function handleInputVal(e){
         
-        setInput({
-            ...input,
+        setEditData({
+            ...editData,
             [e.target.name] : e.target.value
         });
 
     }
 
-    let handleSubmitForm = (e) => {
-        e.preventDefault();
 
-        if(input.name == '' && input.job == '' && input.photo == ''){
+    let handleEditForm = (e) => {
+        e.preventDefault();
+    
+        if(editData.name == '' && editData.job == '' && editData.photo == ''){
 
             alert('All fields are required!');
 
         }else {
 
-            axios.post('http://localhost:3000/staff', input);
-
-            setInput({
-                name: '',
-                job: '',
-                photo: ''
+            axios.patch('http://localhost:3000/staff/' + id, editData).then(res => {
+                axios.get('http://localhost:3000/staff/').then(res => props.allData(res.data.reverse()));
             });
-
-            return navigate('/')
+            // return navigate('/')
 
         }
+
 
         
 
@@ -55,25 +61,25 @@ const StaffCreate = () => {
                 <Col md={8}>
                     <Card>
                         <Card.Header className='d-flex justify-content-between'>
-                            <h3>Create New Staff</h3>
+                            <h3>Edit Staff</h3>
                             <Link to='/' className='btn btn-primary'>All staff</Link>
                         </Card.Header>
                         <Card.Body>
-                            <Form onSubmit={ handleSubmitForm } method='POST' autoComplete='off'>
+                            <Form onSubmit={ handleEditForm } method='POST' autoComplete='off'>
                                 <Form.Group>
                                     <Form.Label>Name</Form.Label>
-                                    <Form.Control name='name' value={ input.name } onChange={ (e) => handleInputVal(e) } />
+                                    <Form.Control name='name' value={ editData.name } onChange={ (e) => handleInputVal(e) } />
                                 </Form.Group>
                                 <Form.Group>
                                     <Form.Label>Job</Form.Label>
-                                    <Form.Control name='job' value={ input.job } onChange={ (e) => handleInputVal(e) } />
+                                    <Form.Control name='job' value={ editData.job } onChange={ (e) => handleInputVal(e) } />
                                 </Form.Group>
                                 <Form.Group>
                                     <Form.Label>Photo</Form.Label>
-                                    <Form.Control name='photo' value={ input.photo } onChange={ (e) => handleInputVal(e) } />
+                                    <Form.Control name='photo' value={ editData.photo } onChange={ (e) => handleInputVal(e) } />
                                 </Form.Group><br />
                                 <Form.Group>
-                                    <Button type='submit' className='btn btn-primary btn-sm'>Add now</Button>
+                                    <Button type='submit' className='btn btn-primary btn-sm'>Update</Button>
                                 </Form.Group>
                             </Form>
                         </Card.Body>
@@ -85,4 +91,4 @@ const StaffCreate = () => {
   )
 }
 
-export default StaffCreate;
+export default StaffEdit;
