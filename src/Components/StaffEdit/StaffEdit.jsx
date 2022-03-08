@@ -42,10 +42,9 @@ const StaffEdit = (props) => {
 
         }else {
 
-            axios.patch('http://localhost:3000/staff/' + id, editData).then(res => {
-                axios.get('http://localhost:3000/staff/').then(res => props.allData(res.data.reverse()));
-            });
-            // return navigate('/')
+            axios.patch('http://localhost:3000/staff/' + id, editData);
+            
+            return navigate('/')
 
         }
 

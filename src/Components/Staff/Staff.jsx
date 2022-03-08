@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import swal from 'sweetalert';
 import axios from 'axios';
 import './Staff.css';
 
@@ -23,9 +24,30 @@ const Staff = () => {
 
   //delete 
   let handleDeleteStaff = (id) => {
-    axios.delete('http://localhost:3000/staff/' + id).then(res => {
-        axios.get('http://localhost:3000/staff').then(res => setStaff(res.data.reverse()));
-    });
+
+    swal({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this imaginary file!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+
+            axios.delete('http://localhost:3000/staff/' + id).then(res => {
+                axios.get('http://localhost:3000/staff').then(res => setStaff(res.data.reverse()));
+            });
+
+          swal("Poof! Your imaginary file has been deleted!", {
+            icon: "success",
+          });
+        } else {
+          swal("Your imaginary file is safe!");
+        }
+     });
+
+ 
 
     
 
@@ -65,7 +87,7 @@ const Staff = () => {
                                             <td><img style={{height: '60px', width: '60px'}} src={ data.photo } alt="" /></td>
                                             <td>
                                                 <Link to={ '/staff/' + data.id } className='btn btn-warning btn-sm'>View</Link> &nbsp;
-                                                <Link allData={setStaff} to={ '/staff/edit/' + data.id } className='btn btn-info btn-sm'>Edit</Link> &nbsp;
+                                                <Link to={ '/staff/edit/' + data.id } className='btn btn-info btn-sm'>Edit</Link> &nbsp;
                                                 <Button onClick={ () => handleDeleteStaff(data.id) } className='btn btn-danger btn-sm'>Delete</Button>
                                             </td>
                                         </tr>
